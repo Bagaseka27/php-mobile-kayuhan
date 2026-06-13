@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/ic_dashboard"
+            android:title="Dashboard" />
+        <item
+            android:id="@+id/nav_kasir"
+            android:icon="@drawable/ic_kasir"
+            android:title="Kasir (POS)" />
+        <item
+            android:id="@+id/nav_menu"
+            android:icon="@drawable/ic_menu"
+            android:title="Daftar Menu" />
+        <item
+            android:id="@+id/nav_presensi"
+            android:icon="@drawable/ic_presensi"
+            android:title="Presensi" />
+        <item
+            android:id="@+id/nav_gaji"
+            android:icon="@drawable/ic_gaji"
+            android:title="Gaji" />
+        <item
+            android:id="@+id/nav_riwayat"
+            android:icon="@drawable/ic_history"
+            android:title="Riwayat Transaksi" />
+    </group>
+
+    <item android:title="Akun">
+        <menu>
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_logout"
+                android:title="Keluar" />
+        </menu>
+    </item>
+</menu>

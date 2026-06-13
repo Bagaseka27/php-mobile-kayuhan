@@ -108,7 +108,6 @@ class TabDataKaryawanFragment : Fragment() {
 
     private fun loadData() {
         val listAll = mutableListOf<Map<String, String>>()
-        // Query JOIN untuk mengambil Nama Cabang melalui Rombong
         val query = """
             SELECT k.email, k.nama, k.no_hp, k.id_rombong, k.posisi, c.nama_lokasi, k.id_jabatan
             FROM karyawan k
@@ -130,7 +129,6 @@ class TabDataKaryawanFragment : Fragment() {
         }
         cursor.close()
 
-        // Filter List
         val adminList = listAll.filter { it["posisi"] == "Admin" }
         val baristaList = listAll.filter { it["posisi"] == "Barista" }
 
@@ -144,19 +142,16 @@ class TabDataKaryawanFragment : Fragment() {
         dialog.setContentView(d.root)
         dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
-        // Setup Spinner Jabatan
         val jabNames = mutableListOf<String>(); val jabIds = mutableListOf<Int>()
         val curJab = db.readableDatabase.rawQuery("SELECT id_jabatan, nama_jabatan FROM jabatan", null)
         while(curJab.moveToNext()){ jabIds.add(curJab.getInt(0)); jabNames.add(curJab.getString(1)) }
         curJab.close()
         d.spinnerJabatan.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, jabNames))
 
-        // Visibility Rombong & Cabang
         d.rgRole.setOnCheckedChangeListener { _, checkedId ->
             d.layoutLokasi.visibility = if (checkedId == d.rbAdmin.id) View.GONE else View.VISIBLE
         }
 
-        // Setup Spinner Cabang & Rombong
         val cabIds = mutableListOf<String>(); val cabNames = mutableListOf<String>()
         val curCab = db.readableDatabase.rawQuery("SELECT id_cabang, nama_lokasi FROM cabang", null)
         while(curCab.moveToNext()){ cabIds.add(curCab.getString(0)); cabNames.add(curCab.getString(1)) }
@@ -171,7 +166,6 @@ class TabDataKaryawanFragment : Fragment() {
             d.spinnerRombong.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, romList))
         }
 
-        // Edit Mode
         item?.let {
             d.etEmail.setText(it.email); d.etEmail.isEnabled = false
             d.etNamaLengkap.setText(it.nama)
@@ -215,7 +209,6 @@ class TabDataKaryawanFragment : Fragment() {
 
         override fun onBindViewHolder(h: RecyclerView.ViewHolder, pos: Int) {
             val m = list[pos]
-            // Data object untuk dikirim ke dialog edit
             val obj = Karyawan(m["email"]!!, m["id_jabatan"]!!.toInt(), m["id_rombong"]!!, m["nama"]!!, m["no_hp"]!!, m["posisi"]!!)
 
             if (h is AdminVH) {
@@ -248,6 +241,7 @@ class TabDataKaryawanFragment : Fragment() {
         inner class BaristaVH(val b: ItemKaryawanBaristaBinding) : RecyclerView.ViewHolder(b.root)
     }
 }
+
 // ─── TAB 2: MANAJEMEN GAJI ─────────────────────────────────────────────────
 
 class TabDataGajiFragment : Fragment() {
@@ -270,21 +264,14 @@ class TabDataGajiFragment : Fragment() {
 
     private fun loadGaji() {
         val listGaji = mutableListOf<DataGaji>()
-        // Gunakan LEFT JOIN agar data tetap muncul meskipun data karyawan ada yang bermasalah
         val cursor = db.readableDatabase.rawQuery(
             "SELECT g.*, IFNULL(k.nama, 'Tanpa Nama') FROM gaji g LEFT JOIN karyawan k ON g.email = k.email",
             null
         )
         while (cursor.moveToNext()) {
             listGaji.add(DataGaji(
-                cursor.getString(0), // idGaji
-                cursor.getString(1), // email
-                cursor.getString(7), // nama (hasil join)
-                cursor.getString(2), // periode
-                cursor.getLong(3),   // gapok
-                cursor.getLong(4),   // bonus
-                cursor.getLong(5),   // kompensasi
-                cursor.getLong(6)    // total
+                cursor.getString(0), cursor.getString(1), cursor.getString(7), cursor.getString(2),
+                cursor.getLong(3), cursor.getLong(4), cursor.getLong(5), cursor.getLong(6)
             ))
         }
         cursor.close()
@@ -368,14 +355,16 @@ class TabDataGajiFragment : Fragment() {
     }
 }
 
-// ─── TAB 3: JADWAL SHIFT ───────────────────────────────────────────────────
-
-// ... (imports lainnya tetap sama)
+// ─── TAB 3: JADWAL SHIFT (INTEGRASI MYSQL ONLINE) ──────────────────────────
 
 class TabJadwalShiftFragment : Fragment() {
     private var _binding: TabJadwalShiftBinding? = null
     private val binding get() = _binding!!
     private lateinit var db: DBOpenHelper
+
+    private val urlWebServiceJadwal = "http://192.168.0.32/kayuhanmobile/query_jadwal.php"
+    private val listJadwal = ArrayList<JadwalShift>()
+    private lateinit var adapterJadwal: JadwalAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = TabJadwalShiftBinding.inflate(inflater, container, false)
@@ -386,31 +375,49 @@ class TabJadwalShiftFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.rvJadwal.layoutManager = LinearLayoutManager(context)
-        loadData()
+        adapterJadwal = JadwalAdapter(listJadwal)
+        binding.rvJadwal.adapter = adapterJadwal
+
+        loadJadwalDataFromMySQL()
         binding.btnBuatJadwal.setOnClickListener { showShiftDialog(null) }
     }
 
-    private fun loadData() {
-        val list = mutableListOf<JadwalShift>()
-        // Query disesuaikan dengan DB_Ver 5 (ada kolom lokasi)
-        val cur = db.readableDatabase.rawQuery(
-            "SELECT s.id_jadwal, s.email, k.nama, s.tanggal, s.jam_mulai, s.jam_selesai, s.lokasi " +
-                    "FROM jadwal_shift s JOIN karyawan k ON s.email = k.email", null
-        )
+    private fun loadJadwalDataFromMySQL() {
+        kotlin.concurrent.thread {
+            try {
+                val url = java.net.URL("$urlWebServiceJadwal?mode=select")
+                val conn = url.openConnection() as java.net.HttpURLConnection
+                conn.requestMethod = "GET"
+                conn.connectTimeout = 5000
+                conn.readTimeout = 5000
 
-        while (cur.moveToNext()) {
-            list.add(JadwalShift(
-                cur.getInt(0),
-                cur.getString(1),
-                cur.getString(2), // nama
-                cur.getString(3), // tanggal
-                cur.getString(4), // jam_mulai
-                cur.getString(5), // jam_selesai
-                cur.getString(6)  // lokasi
-            ))
+                val responseText = conn.inputStream.bufferedReader().readText()
+                val jsonArray = org.json.JSONArray(responseText)
+
+                listJadwal.clear()
+                for (i in 0 until jsonArray.length()) {
+                    val obj = jsonArray.getJSONObject(i)
+                    listJadwal.add(
+                        JadwalShift(
+                            obj.getInt("id_jadwal"),
+                            obj.getString("EMAIL"),
+                            obj.optString("nama_karyawan", "Karyawan"),
+                            obj.getString("TANGGAL"),
+                            obj.getString("JAM_MULAI"),
+                            obj.getString("JAM_SELESAI"),
+                            // FIX: Tampilkan NAMA_LOKASI dari hasil JOIN di PHP
+                            obj.optString("NAMA_LOKASI", obj.optString("ID_CABANG", "-"))
+                        )
+                    )
+                }
+
+                activity?.runOnUiThread {
+                    adapterJadwal.notifyDataSetChanged()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
-        cur.close()
-        binding.rvJadwal.adapter = JadwalAdapter(list)
     }
 
     private fun showShiftDialog(item: JadwalShift?) {
@@ -419,21 +426,30 @@ class TabJadwalShiftFragment : Fragment() {
         dialog.setContentView(d.root)
         dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
-        // 1. SETUP KARYAWAN
-        val names = mutableListOf<String>(); val emails = mutableListOf<String>()
+        // 1. Ambil list Karyawan dari SQLite lokal untuk Spinner
+        val names = mutableListOf<String>()
+        val emails = mutableListOf<String>()
         val curK = db.readableDatabase.rawQuery("SELECT email, nama FROM karyawan", null)
-        while(curK.moveToNext()){ emails.add(curK.getString(0)); names.add(curK.getString(1)) }
+        while(curK.moveToNext()){
+            emails.add(curK.getString(0))
+            names.add(curK.getString(1))
+        }
         curK.close()
         d.spinnerKaryawan.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, names))
 
-        // 2. SETUP LOKASI
+        // 2. Ambil list Cabang dari SQLite lokal untuk Spinner
+        // FIX: Simpan id_cabang juga, bukan hanya nama_lokasi
+        val cabIds = mutableListOf<String>()
         val cabNames = mutableListOf<String>()
-        val curC = db.readableDatabase.rawQuery("SELECT nama_lokasi FROM cabang", null)
-        while(curC.moveToNext()){ cabNames.add(curC.getString(0)) }
+        val curC = db.readableDatabase.rawQuery("SELECT id_cabang, nama_lokasi FROM cabang", null)
+        while(curC.moveToNext()){
+            cabIds.add(curC.getString(0))
+            cabNames.add(curC.getString(1))
+        }
         curC.close()
         d.spinnerLokasi.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, cabNames))
 
-        // 3. DATE & TIME PICKER
+        // 3. Setup Dialog Date & Time Picker
         d.etTanggal.setOnClickListener {
             val c = Calendar.getInstance()
             DatePickerDialog(requireContext(), { _, y, m, day ->
@@ -455,7 +471,7 @@ class TabJadwalShiftFragment : Fragment() {
             }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show()
         }
 
-        // EDIT MODE
+        // Jika dalam Mode Edit, tampilkan data yang lama
         item?.let {
             d.spinnerKaryawan.setText(it.nama, false)
             d.spinnerLokasi.setText(it.lokasi, false)
@@ -466,52 +482,129 @@ class TabJadwalShiftFragment : Fragment() {
 
         d.btnSimpan.setOnClickListener {
             val selIdx = names.indexOf(d.spinnerKaryawan.text.toString())
-            val lokasi = d.spinnerLokasi.text.toString()
+            val lokasiIdx = cabNames.indexOf(d.spinnerLokasi.text.toString())
+            val tanggal = d.etTanggal.text.toString()
+            val jamMulai = d.etJamMulai.text.toString()
+            val jamSelesai = d.etJamSelesai.text.toString()
 
-            if (selIdx == -1 || lokasi.isEmpty() || d.etTanggal.text.toString().isEmpty()) {
+            if (selIdx == -1 || lokasiIdx == -1 || tanggal.isEmpty()) {
                 Toast.makeText(context, "Harap lengkapi data!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val v = ContentValues().apply {
-                put("email", emails[selIdx])
-                put("lokasi", lokasi)
-                put("tanggal", d.etTanggal.text.toString())
-                put("jam_mulai", d.etJamMulai.text.toString())
-                put("jam_selesai", d.etJamSelesai.text.toString())
-            }
+            val email = emails[selIdx]
+            // FIX: Kirim id_cabang (misal "CBG-KDR1") bukan nama lokasi string
+            val idCabang = cabIds[lokasiIdx]
 
-            try {
-                if (item == null) db.writableDatabase.insert("jadwal_shift", null, v)
-                else db.writableDatabase.update("jadwal_shift", v, "id_jadwal=?", arrayOf(item.idJadwal.toString()))
-                loadData()
-                dialog.dismiss()
-            } catch (e: Exception) {
-                Toast.makeText(context, "Gagal simpan: ${e.message}", Toast.LENGTH_LONG).show()
+            kotlin.concurrent.thread {
+                try {
+                    val url = java.net.URL(urlWebServiceJadwal)
+                    val conn = url.openConnection() as java.net.HttpURLConnection
+                    conn.requestMethod = "POST"
+                    conn.doOutput = true
+
+                    val mode = if (item == null) "insert" else "update"
+                    var params = "mode=$mode&email=${java.net.URLEncoder.encode(email, "UTF-8")}" +
+                            "&id_cabang=${java.net.URLEncoder.encode(idCabang, "UTF-8")}" +
+                            "&tanggal=${java.net.URLEncoder.encode(tanggal, "UTF-8")}" +
+                            "&jam_mulai=${java.net.URLEncoder.encode(jamMulai, "UTF-8")}" +
+                            "&jam_selesai=${java.net.URLEncoder.encode(jamSelesai, "UTF-8")}"
+
+                    if (item != null) {
+                        params += "&id_jadwal=${item.idJadwal}"
+                    }
+
+                    val writer = java.io.OutputStreamWriter(conn.outputStream)
+                    writer.write(params)
+                    writer.flush()
+                    writer.close()
+
+                    val res = conn.inputStream.bufferedReader().readText()
+                    val obj = org.json.JSONObject(res)
+
+                    activity?.runOnUiThread {
+                        if (obj.getString("kode") == "000") {
+                            Toast.makeText(requireContext(), "Jadwal berhasil disimpan ke MySQL", Toast.LENGTH_SHORT).show()
+                            loadJadwalDataFromMySQL()
+                            dialog.dismiss()
+                        } else {
+                            Toast.makeText(requireContext(), "Gagal: ${obj.getString("pesan")}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    activity?.runOnUiThread {
+                        Toast.makeText(requireContext(), "Koneksi Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
             }
         }
+
         d.btnClose.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 
     inner class JadwalAdapter(val list: List<JadwalShift>) : RecyclerView.Adapter<JadwalAdapter.VH>() {
         inner class VH(val b: ItemJadwalBinding) : RecyclerView.ViewHolder(b.root)
-        override fun onCreateViewHolder(p: ViewGroup, t: Int) = VH(ItemJadwalBinding.inflate(LayoutInflater.from(p.context), p, false))
+
+        override fun onCreateViewHolder(p: ViewGroup, t: Int) =
+            VH(ItemJadwalBinding.inflate(LayoutInflater.from(p.context), p, false))
+
         override fun onBindViewHolder(h: VH, pos: Int) {
             val i = list[pos]
+            h.b.tvIdJadwal.text = i.idJadwal.toString()
             h.b.tvNama.text = i.nama
-            h.b.tvLokasi.text = i.lokasi // Pastikan tvLokasi ada di item_jadwal.xml
+            h.b.tvLokasi.text = i.lokasi
             h.b.tvTanggal.text = i.tanggal
             h.b.tvJam.text = "${i.jamMulai} - ${i.jamSelesai}"
+
             h.b.btnEdit.setOnClickListener { showShiftDialog(i) }
             h.b.btnHapus.setOnClickListener {
-                db.writableDatabase.delete("jadwal_shift", "id_jadwal=?", arrayOf(i.idJadwal.toString()))
-                loadData()
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Hapus Jadwal")
+                    .setMessage("Yakin ingin menghapus jadwal ID ${i.idJadwal} dari MySQL?")
+                    .setPositiveButton("Ya") { _, _ ->
+                        kotlin.concurrent.thread {
+                            try {
+                                val url = java.net.URL(urlWebServiceJadwal)
+                                val conn = url.openConnection() as java.net.HttpURLConnection
+                                conn.requestMethod = "POST"
+                                conn.doOutput = true
+
+                                val params = "mode=delete&id_jadwal=${i.idJadwal}"
+                                val writer = java.io.OutputStreamWriter(conn.outputStream)
+                                writer.write(params)
+                                writer.flush()
+                                writer.close()
+
+                                val res = conn.inputStream.bufferedReader().readText()
+                                val obj = org.json.JSONObject(res)
+
+                                activity?.runOnUiThread {
+                                    if (obj.getString("kode") == "000") {
+                                        Toast.makeText(requireContext(), "Jadwal terhapus dari MySQL", Toast.LENGTH_SHORT).show()
+                                        loadJadwalDataFromMySQL()
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+                    .setNegativeButton("Tidak", null)
+                    .show()
             }
         }
+
         override fun getItemCount() = list.size
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
+
 // ─── TAB 4: MANAJEMEN JABATAN ──────────────────────────────────────────────
 
 class TabJabatanFragment : Fragment() {
