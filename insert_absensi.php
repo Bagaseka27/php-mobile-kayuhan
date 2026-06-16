@@ -1,5 +1,6 @@
 <?php
-$DB_NAME = "kayuhanmobile";
+date_default_timezone_set('Asia/Jakarta');
+$DB_NAME = "kayuhan";
 $DB_USER = "root";
 $DB_PASS = "";
 $DB_SERVER_LOC = "localhost";

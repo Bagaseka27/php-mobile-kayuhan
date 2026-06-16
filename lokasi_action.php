@@ -2,14 +2,14 @@
 include 'koneksi.php';
 header("Content-Type: application/json; charset=UTF-8");
 
-$mode = $_POST['mode'] ?? '';
+$mode = $_POST['mode'] ?? $_GET['mode'] ?? 'select';
 $respon = array("kode" => "000");
 
-// 1. AMBIL DATA (GET)
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+// 1. AMBIL DATA (GET or POST with select mode)
+if ($mode == 'select' || $_SERVER['REQUEST_METHOD'] == 'GET') {
     // Memakai SELECT * agar aman dari error kolom saat menampilkan data
     $sql = "SELECT * FROM cabang";
-    $result = mysqli_query($conn, $sql);
+    $result = mysqli_query($kon, $sql);
 
     $data = array();
     if ($result) {
@@ -31,13 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (empty($id_rombong)) {
             // FIX SAKTI: Menyebutkan nama kolom database asli kamu secara spesifik (ID_CABANG, NAMA_LOKASI)
             $sql = "INSERT INTO cabang (ID_CABANG, NAMA_LOKASI) VALUES ('$id_cabang', '$nama_cabang')";
-            if (!mysqli_query($conn, $sql)) {
-                $respon = array("kode" => "111", "pesan" => mysqli_error($conn));
+            if (!mysqli_query($kon, $sql)) {
+                $respon = array("kode" => "111", "pesan" => mysqli_error($kon));
             }
         } else {
             $sql = "INSERT INTO rombong (ID_ROMBONG, ID_CABANG) VALUES ('$id_rombong', '$id_cabang')";
-            if (!mysqli_query($conn, $sql)) {
-                $respon = array("kode" => "111", "pesan" => mysqli_error($conn));
+            if (!mysqli_query($kon, $sql)) {
+                $respon = array("kode" => "111", "pesan" => mysqli_error($kon));
             }
         }
     } 
@@ -45,23 +45,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (empty($id_rombong)) {
             // FIX SAKTI: Update langsung ke kolom NAMA_LOKASI
             $sql = "UPDATE cabang SET NAMA_LOKASI='$nama_cabang' WHERE ID_CABANG='$id_cabang'";
-            if (!mysqli_query($conn, $sql)) {
-                $respon = array("kode" => "111", "pesan" => mysqli_error($conn));
+            if (!mysqli_query($kon, $sql)) {
+                $respon = array("kode" => "111", "pesan" => mysqli_error($kon));
             }
         } else {
             $sql = "UPDATE rombong SET ID_ROMBONG='$id_rombong' WHERE ID_CABANG='$id_cabang'";
-            if (!mysqli_query($conn, $sql)) {
-                $respon = array("kode" => "111", "pesan" => mysqli_error($conn));
+            if (!mysqli_query($kon, $sql)) {
+                $respon = array("kode" => "111", "pesan" => mysqli_error($kon));
             }
         }
     } 
     else if ($mode == "delete") {
         if (empty($id_rombong)) {
             $sql = "DELETE FROM cabang WHERE ID_CABANG='$id_cabang'";
-            mysqli_query($conn, $sql);
+            mysqli_query($kon, $sql);
         } else {
             $sql = "DELETE FROM rombong WHERE ID_ROMBONG='$id_rombong'";
-            mysqli_query($conn, $sql);
+            mysqli_query($kon, $sql);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.example.kayuhan
 
 import android.content.Intent
-import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +11,6 @@ import com.example.kayuhan.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var db: SQLiteDatabase
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,9 +48,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inisialisasi Database SQLite Lokal
-        db = DBOpenHelper(this).writableDatabase
-
         // Inisialisasi ViewPager2 dengan Adapter internal
         val adapter = MainPagerAdapter(this)
         binding.viewPagerMain.adapter = adapter
@@ -79,9 +74,6 @@ class MainActivity : AppCompatActivity() {
         // Menonaktifkan auto-tint warna default Android agar ikon Bottom Navigation menggunakan warna aslinya
         binding.bottomNavigationView.itemIconTintList = null
     }
-
-    // Fungsi helper untuk membagikan objek database ke fragment-fragment di dalamnya jika dibutuhkan
-    fun getDbObject(): SQLiteDatabase = db
 
     // Adapter untuk mengatur Fragment yang tampil di dalam ViewPager2 milik Admin
     inner class MainPagerAdapter(fa: AppCompatActivity) : FragmentStateAdapter(fa) {

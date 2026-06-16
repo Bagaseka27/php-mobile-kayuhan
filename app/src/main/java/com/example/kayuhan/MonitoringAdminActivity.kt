@@ -17,7 +17,7 @@ class MonitoringAdminActivity : AppCompatActivity() {
     private val dataListAbsen = ArrayList<HashMap<String, String>>()
 
     // Sesuaikan IP 10.0.2.2 dengan IP server local laptopmu
-    private val urlGetAbsen = "http://192.168.0.32/kayuhanmobile/get_absensi.php"
+    private val urlGetAbsen = "http://192.168.0.32/php-mobile-kayuhan/get_absensi.php"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

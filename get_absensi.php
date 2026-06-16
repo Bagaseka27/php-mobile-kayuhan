@@ -1,5 +1,5 @@
 <?php
-$DB_NAME = "kayuhanmobile";
+$DB_NAME = "kayuhan";
 $DB_USER = "root";
 $DB_PASS = "";
 $DB_SERVER_LOC = "localhost";
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'GET')
     $ip_laptop = "192.168.0.32";
 
     $sql = "SELECT id, EMAIL, TANGGAL, DATETIME_DATANG, LOKASI_DATANG, LAT_DATANG, LNG_DATANG,
-            CONCAT('http://$ip_laptop/kayuhanmobile/images/', FOTO_DATANG) AS url_foto
+            CONCAT('http://$ip_laptop/php-mobile-kayuhan/images/', FOTO_DATANG) AS url_foto
             FROM absensi
             ORDER BY DATETIME_DATANG DESC";
 

@@ -7,59 +7,85 @@
     android:background="#F5F5E8"
     android:padding="16dp">
 
-    <!-- Row: Periode + Tambah Gaji -->
-    <LinearLayout
+    <!-- Sub-menu Buttons Row (scrollable) -->
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:scrollbars="none"
         android:layout_marginBottom="12dp">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <TextView
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPengambilanGaji"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Periode: "
-                android:textColor="#1B5E3B"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:layout_height="36dp"
+                android:text="Pengambilan Gaji"
+                android:textSize="10sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#1B5E3B"
+                app:cornerRadius="8dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="6dp"
+                app:icon="@android:drawable/ic_menu_edit"
+                app:iconTint="#FFFFFF"
+                app:iconSize="13dp" />
 
-            <com.google.android.material.textfield.TextInputLayout
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPenyimpananGaji"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxStrokeColor="#1B5E3B"
-                app:boxStrokeWidth="1dp">
+                android:layout_height="36dp"
+                android:text="Penyimpanan Gaji"
+                android:textSize="10sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#E67E22"
+                app:cornerRadius="8dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="6dp"
+                app:icon="@android:drawable/ic_menu_save"
+                app:iconTint="#FFFFFF"
+                app:iconSize="13dp" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etPeriodeFilter"
-                    android:layout_width="120dp"
-                    android:layout_height="40dp"
-                    android:hint="Pilih Bulan"
-                    android:textSize="12sp"
-                    android:paddingHorizontal="8dp" />
-            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTabungan"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Tabungan"
+                android:textSize="10sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#2A9D8F"
+                app:cornerRadius="8dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="10dp"
+                app:icon="@android:drawable/ic_menu_agenda"
+                app:iconTint="#FFFFFF"
+                app:iconSize="13dp" />
         </LinearLayout>
+    </HorizontalScrollView>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnTambahGaji"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tambah Data Gaji"
-            android:textColor="#FFFFFF"
-            android:textSize="11sp"
-            android:backgroundTint="#1B5E3B"
-            app:cornerRadius="8dp"
-            app:icon="@android:drawable/ic_input_add"
-            app:iconTint="#FFFFFF"
-            app:iconSize="14dp" />
-    </LinearLayout>
+    <!-- Hidden Tambah button (kept for binding compatibility) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnTambahGaji"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:text="Tambah" />
+
+    <!-- Hidden periode filter (kept for binding compatibility) -->
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/etPeriodeFilter"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
 
     <!-- Table Gaji -->
     <androidx.cardview.widget.CardView
@@ -95,7 +121,7 @@
                         <TextView android:layout_width="40dp" android:layout_height="wrap_content"
                             android:text="NO" android:textColor="#555" android:textSize="10sp" android:textStyle="bold" />
                         <TextView android:layout_width="110dp" android:layout_height="wrap_content"
-                            android:text="NAMA" android:textColor="#555" android:textSize="10sp" android:textStyle="bold" />
+                            android:text="NAMA KARYAWAN" android:textColor="#555" android:textSize="10sp" android:textStyle="bold" />
                         <TextView android:layout_width="90dp" android:layout_height="wrap_content"
                             android:text="PERIODE" android:textColor="#555" android:textSize="10sp" android:textStyle="bold" />
                         <TextView android:layout_width="90dp" android:layout_height="wrap_content"
@@ -104,9 +130,9 @@
                             android:text="BONUS" android:textColor="#555" android:textSize="10sp" android:textStyle="bold" />
                         <TextView android:layout_width="90dp" android:layout_height="wrap_content"
                             android:text="KOMPENSASI" android:textColor="#555" android:textSize="10sp" android:textStyle="bold" />
-                        <TextView android:layout_width="90dp" android:layout_height="wrap_content"
-                            android:text="TOTAL GAJI" android:textColor="#555" android:textSize="10sp" android:textStyle="bold" />
-                        <TextView android:layout_width="80dp" android:layout_height="wrap_content"
+                        <TextView android:layout_width="110dp" android:layout_height="wrap_content"
+                            android:text="TOTAL GAJI AKHIR" android:textColor="#555" android:textSize="10sp" android:textStyle="bold" />
+                        <TextView android:layout_width="110dp" android:layout_height="wrap_content"
                             android:text="AKSI" android:textColor="#555" android:textSize="10sp" android:textStyle="bold"
                             android:gravity="center" />
                     </LinearLayout>

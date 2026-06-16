@@ -47,7 +47,7 @@ class PresensiBaristaActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private val urlWebService = "http://192.168.0.32/kayuhanmobile/insert_absensi.php"
+    private val urlWebService = "http://192.168.0.32/php-mobile-kayuhan/insert_absensi.php"
 
     private var currentLat = 0.0
     private var currentLng = 0.0

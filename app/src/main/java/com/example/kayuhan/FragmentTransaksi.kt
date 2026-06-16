@@ -1,8 +1,6 @@
 package com.example.kayuhan
 
 import android.app.DatePickerDialog
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -10,23 +8,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import org.json.JSONArray
 import java.util.*
-import kotlin.collections.ArrayList
 
 class FragmentTransaksi : Fragment() {
 
     private lateinit var listView: ListView
     private lateinit var tvTotal: TextView
-
-    lateinit var thisParent: MainActivity
-    lateinit var db: SQLiteDatabase
+    private val apiUrl = "http://192.168.0.109/php-mobile-kayuhan/transaksi_action.php"
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         val view = inflater.inflate(R.layout.activity_fragment_transaksi, container, false)
 
         listView = view.findViewById(R.id.listTransaksi)
@@ -34,9 +29,6 @@ class FragmentTransaksi : Fragment() {
         val etDari: EditText = view.findViewById(R.id.etDari)
         val etSampai: EditText = view.findViewById(R.id.etSampai)
         val btnTampil: Button = view.findViewById(R.id.btnTampil)
-
-        thisParent = activity as MainActivity
-        db = thisParent.getDbObject()
 
         val calendar = Calendar.getInstance()
 
@@ -56,7 +48,6 @@ class FragmentTransaksi : Fragment() {
         fun setupDateTimePicker(editText: EditText) {
             editText.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_UP) {
-                    // Cek jika klik pada ikon kalender (kanan)
                     val drawableRight = 2
                     if (editText.compoundDrawables[drawableRight] != null) {
                         if (event.rawX >= (editText.right - editText.compoundDrawables[drawableRight].bounds.width() - editText.paddingEnd)) {
@@ -84,53 +75,62 @@ class FragmentTransaksi : Fragment() {
     }
 
     private fun tampilData(dari: String = "", sampai: String = "") {
-        val list = ArrayList<String>()
+        val email = when (val act = activity) {
+            is DashboardBaristaActivity -> act.intent.getStringExtra("EXTRA_EMAIL") ?: ""
+            is MainActivity -> act.intent.getStringExtra("EXTRA_EMAIL") ?: ""
+            else -> ""
+        }
+        val role = when (activity) {
+            is DashboardBaristaActivity -> "barista"
+            is MainActivity -> "admin"
+            else -> "admin"
+        }
 
-        var query = "SELECT * FROM transaksi"
-        val selectionArgs = ArrayList<String>()
+        val params = mutableMapOf<String, String>()
+        params["role"] = role
+        params["email"] = email
 
         if (dari.isNotEmpty() && sampai.isNotEmpty()) {
-            query += " WHERE tanggal BETWEEN ? AND ?"
-            selectionArgs.add("$dari 00:00:00")
-            selectionArgs.add("$sampai 23:59:59")
+            params["dari"] = "$dari 00:00:00"
+            params["sampai"] = "$sampai 23:59:59"
         }
 
-        val cursor: Cursor = db.rawQuery(query, selectionArgs.toTypedArray())
+        postKeServer(requireContext(), apiUrl, params) { response ->
+            try {
+                val list = ArrayList<String>()
+                val data = JSONArray(response)
+                var totalPendapatan = 0
 
-        var totalPendapatan = 0
+                for (i in 0 until data.length()) {
+                    val obj = data.getJSONObject(i)
+                    val id = obj.getString("ID_TRANSAKSI")
+                    val jumlahItem = obj.getInt("JUMLAH_ITEM")
+                    val datetime = obj.getString("WAKTU_TRANSAKSI")
+                    val total = obj.getInt("TOTAL_HARGA")
+                    val metode = obj.getString("METODE_BAYAR")
 
-        if (cursor.moveToFirst()) {
-            do {
-                val id = cursor.getString(0)
-                val jumlahItem = cursor.getInt(2)
-                val datetime = cursor.getString(4)
-                val total = cursor.getInt(5)
-                val metode = cursor.getString(6)
+                    totalPendapatan += total
 
-                totalPendapatan += total
+                    val text = """
+                        ID Trx: $id
+                        Waktu: $datetime
+                        Item: $jumlahItem item
+                        Metode: $metode
+                        Total Bayar: Rp $total
+                    """.trimIndent()
 
-                val text = """
-                    ID: $id
-                    Tanggal: $datetime
-                    Item: $jumlahItem item
-                    Metode: $metode
-                    Total: Rp $total
-                """.trimIndent()
+                    list.add(text)
+                }
 
-                list.add(text)
+                val adapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_list_item_1,
+                    list
+                )
 
-            } while (cursor.moveToNext())
+                listView.adapter = adapter
+                tvTotal.text = "Rp $totalPendapatan"
+            } catch (e: Exception) { e.printStackTrace() }
         }
-
-        cursor.close()
-
-        val adapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_list_item_1,
-            list
-        )
-
-        listView.adapter = adapter
-        tvTotal.text = "Rp $totalPendapatan"
     }
 }

@@ -1,5 +1,5 @@
 <?php
-$DB_NAME = "kayuhanmobile";
+$DB_NAME = "kayuhan";
 $DB_USER = "root";
 $DB_PASS = "";
 $DB_SERVER_LOC = "localhost";
@@ -46,11 +46,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'GET')
             $jam_mulai  = $_POST['jam_mulai'];
             $jam_selesai = $_POST['jam_selesai'];
 
+            // Generate unique ID_JADWAL like JDYYYYMMDDxxxxx
+            $tanggal_clean = str_replace('-', '', $tanggal);
+            $random_suffix = substr(md5(uniqid(rand(), true)), 0, 5);
+            $id_jadwal = "JD" . $tanggal_clean . $random_suffix;
+
             $stmt = mysqli_prepare($conn,
-                "INSERT INTO jadwal (EMAIL, ID_CABANG, TANGGAL, JAM_MULAI, JAM_SELESAI)
-                 VALUES (?, ?, ?, ?, ?)"
+                "INSERT INTO jadwal (ID_JADWAL, EMAIL, ID_CABANG, TANGGAL, JAM_MULAI, JAM_SELESAI)
+                 VALUES (?, ?, ?, ?, ?, ?)"
             );
-            mysqli_stmt_bind_param($stmt, "sssss", $email, $id_cabang, $tanggal, $jam_mulai, $jam_selesai);
+            mysqli_stmt_bind_param($stmt, "ssssss", $id_jadwal, $email, $id_cabang, $tanggal, $jam_mulai, $jam_selesai);
 
             if (mysqli_stmt_execute($stmt)) {
                 echo json_encode($respon);

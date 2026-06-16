@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 
 class DashboardBaristaActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -17,6 +18,7 @@ class DashboardBaristaActivity : AppCompatActivity(), NavigationView.OnNavigatio
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private lateinit var toolbar: Toolbar
+    private lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +31,7 @@ class DashboardBaristaActivity : AppCompatActivity(), NavigationView.OnNavigatio
         navView = findViewById(R.id.nav_view)
 
         // Mengatur tombol hamburger (garis tiga) di toolbar untuk buka-tutup sidebar
-        val toggle = ActionBarDrawerToggle(
+        toggle = ActionBarDrawerToggle(
             this, drawerLayout, toolbar,
             R.string.navigation_drawer_open, R.string.navigation_drawer_close
         )
@@ -45,22 +47,53 @@ class DashboardBaristaActivity : AppCompatActivity(), NavigationView.OnNavigatio
         if (!emailLogin.isNullOrEmpty()) {
             tvEmailHeader.text = emailLogin
         }
+
+        // Set default fragment to Dashboard
+        if (savedInstanceState == null) {
+            loadFragment(FragmentDashboardAdmin())
+            navView.setCheckedItem(R.id.nav_dashboard)
+        }
+    }
+
+    private fun loadFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
+
+        if (fragment is FragmentPOS) {
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+            toggle.isDrawerIndicatorEnabled = false
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
+            toolbar.setNavigationOnClickListener {
+                loadFragment(FragmentDashboardAdmin())
+                navView.setCheckedItem(R.id.nav_dashboard)
+            }
+        } else {
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+            toggle.isDrawerIndicatorEnabled = true
+            toggle.syncState()
+            toolbar.setNavigationOnClickListener {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    drawerLayout.openDrawer(GravityCompat.START)
+                }
+            }
+        }
     }
 
     // Mengatur Logika Klik pada Item Menu Sidebar
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_dashboard -> {
-                Toast.makeText(this, "Dashboard", Toast.LENGTH_SHORT).show()
-                // Tetap di halaman ini atau load fragment dashboard
+                loadFragment(FragmentDashboardAdmin())
             }
             R.id.nav_kasir -> {
-                // Contoh perpindahan ke activity Kasir/POS
-                // startActivity(Intent(this, KasirActivity::class.java))
-                Toast.makeText(this, "Membuka Kasir (POS)", Toast.LENGTH_SHORT).show()
+                loadFragment(FragmentPOS())
             }
             R.id.nav_menu -> {
-                Toast.makeText(this, "Membuka Daftar Menu", Toast.LENGTH_SHORT).show()
+                loadFragment(FragmentMenu())
             }
             R.id.nav_presensi -> {
                 // Berpindah ke form Presensi yang kita buat kemarin
@@ -70,10 +103,13 @@ class DashboardBaristaActivity : AppCompatActivity(), NavigationView.OnNavigatio
                 startActivity(intentPresensi)
             }
             R.id.nav_gaji -> {
-                Toast.makeText(this, "Membuka Informasi Gaji", Toast.LENGTH_SHORT).show()
+                val emailLogin = intent.getStringExtra("EXTRA_EMAIL")
+                val intentGaji = Intent(this, GajiBaristaActivity::class.java)
+                intentGaji.putExtra("EXTRA_EMAIL", emailLogin)
+                startActivity(intentGaji)
             }
             R.id.nav_riwayat -> {
-                Toast.makeText(this, "Membuka Riwayat Transaksi", Toast.LENGTH_SHORT).show()
+                loadFragment(FragmentTransaksi())
             }
             R.id.nav_logout -> {
                 // Kembali ke halaman login dan hapus tumpukan activity sebelumnya

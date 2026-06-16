@@ -22,7 +22,7 @@
 
         <activity
             android:name=".DashboardBaristaActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:theme="@style/Theme.Kayuhan.NoActionBar"
             android:exported="false" />
 
         <!-- FIX BUG 1: LoginActivity dijadikan LAUNCHER, bukan MainActivity -->
@@ -37,12 +37,17 @@
 
         <activity
             android:name=".MonitoringAdminActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:theme="@style/Theme.Kayuhan.NoActionBar"
             android:exported="false" />
 
         <activity
             android:name=".PresensiBaristaActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:theme="@style/Theme.Kayuhan.NoActionBar"
+            android:exported="false" />
+
+        <activity
+            android:name=".GajiBaristaActivity"
+            android:theme="@style/Theme.Kayuhan.NoActionBar"
             android:exported="false" />
 
         <!-- MainActivity tidak lagi menjadi launcher -->

@@ -2,12 +2,12 @@
 include 'koneksi.php';
 header("Content-Type: application/json; charset=UTF-8");
 
-$mode = $_POST['mode'] ?? '';
+$mode = $_POST['mode'] ?? $_GET['mode'] ?? 'select';
 $respon = array("kode" => "000");
 
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+if ($mode == 'select' || $_SERVER['REQUEST_METHOD'] == 'GET') {
     $sql = "SELECT * FROM menu ORDER BY ID_PRODUK ASC";
-    $result = mysqli_query($conn, $sql);
+    $result = mysqli_query($kon, $sql);
 
     $data = array();
     if ($result) {
@@ -42,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $sql = "INSERT INTO menu (ID_PRODUK, NAMA_PRODUK, KATEGORI, HARGA_DASAR, HARGA_JUAL, FOTO) 
                 VALUES ('$id_produk', '$nama_produk', '$kategori', '$harga_dasar', '$harga_jual', '$nama_file_foto')";
         
-        if (!mysqli_query($conn, $sql)) {
-            $respon = array("kode" => "111", "pesan" => mysqli_error($conn));
+        if (!mysqli_query($kon, $sql)) {
+            $respon = array("kode" => "111", "pesan" => mysqli_error($kon));
         }
     } 
     else if ($mode == "update") {
@@ -58,14 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     WHERE ID_PRODUK='$id_produk'";
         }
                 
-        if (!mysqli_query($conn, $sql)) {
-            $respon = array("kode" => "111", "pesan" => mysqli_error($conn));
+        if (!mysqli_query($kon, $sql)) {
+            $respon = array("kode" => "111", "pesan" => mysqli_error($kon));
         }
     } 
     else if ($mode == "delete") {
         $sql = "DELETE FROM menu WHERE ID_PRODUK='$id_produk'";
-        if (!mysqli_query($conn, $sql)) {
-            $respon = array("kode" => "111", "pesan" => mysqli_error($conn));
+        if (!mysqli_query($kon, $sql)) {
+            $respon = array("kode" => "111", "pesan" => mysqli_error($kon));
         }
     }
 

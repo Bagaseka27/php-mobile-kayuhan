@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5E8"
+    android:padding="16dp">
+
+    <!-- Filter Status Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filter: "
+            android:textColor="#1B5E3B"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFilterMenunggu"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Menunggu"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#F39C12"
+            app:cornerRadius="6dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingHorizontal="12dp"
+            android:layout_marginEnd="6dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFilterDisetujui"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Disetujui"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#7F8C8D"
+            app:cornerRadius="6dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingHorizontal="12dp"
+            android:layout_marginEnd="6dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFilterDitolak"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Ditolak"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#7F8C8D"
+            app:cornerRadius="6dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingHorizontal="12dp" />
+
+    </LinearLayout>
+
+    <!-- Empty State -->
+    <TextView
+        android:id="@+id/tvEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tidak ada pengajuan yang menunggu persetujuan"
+        android:gravity="center"
+        android:textColor="#7F8C8D"
+        android:textSize="13sp"
+        android:paddingVertical="32dp"
+        android:visibility="gone" />
+
+    <!-- List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPengajuan"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp" />
+
+</LinearLayout>
