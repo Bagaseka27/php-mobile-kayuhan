@@ -10,3 +10,4 @@ if (!$kon) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
 ?>
+##
