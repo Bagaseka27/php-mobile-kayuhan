@@ -15,7 +15,7 @@ class FragmentDashboardAdmin : Fragment() {
 
     private var vb: ActivityFragmentDashboardAdminBinding? = null
     private val binding get() = vb!!
-    private val apiUrl = "http://192.168.0.109/php-mobile-kayuhan/dashboard_stats.php"
+    private val apiUrl = ApiConfig.DASHBOARD_STATS
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

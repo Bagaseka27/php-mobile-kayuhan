@@ -19,7 +19,7 @@ class FragmentMenu : Fragment() {
 
     private var _binding: ActivityFragmentMenuBinding? = null
     private val binding get() = _binding!!
-    private val apiUrl = "http://192.168.0.109/php-mobile-kayuhan/menu_action.php"
+    private val apiUrl = ApiConfig.MENU
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

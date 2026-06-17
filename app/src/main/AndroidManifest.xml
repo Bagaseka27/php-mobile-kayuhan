@@ -50,6 +50,11 @@
             android:theme="@style/Theme.Kayuhan.NoActionBar"
             android:exported="false" />
 
+        <activity
+            android:name=".KasirActivity"
+            android:theme="@style/Theme.Kayuhan.NoActionBar"
+            android:exported="false" />
+
         <!-- MainActivity tidak lagi menjadi launcher -->
         <activity
             android:name=".MainActivity"

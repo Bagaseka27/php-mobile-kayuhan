@@ -11,8 +11,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 class FragmentLokasi : Fragment() {
-    private val apiUrl = "http://192.168.0.109/php-mobile-kayuhan/lokasi_action.php"
-    private val apiRombongUrl = "http://192.168.0.109/php-mobile-kayuhan/rombong_action.php"
+    private val apiUrl = ApiConfig.LOKASI
+    private val apiRombongUrl = ApiConfig.ROMBONG
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_fragment_lokasi, container, false)

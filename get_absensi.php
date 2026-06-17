@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'GET')
         exit();
     }
 
-    $ip_laptop = "192.168.0.32";
+    $ip_laptop = $_SERVER['HTTP_HOST'];
 
     $sql = "SELECT id, EMAIL, TANGGAL, DATETIME_DATANG, LOKASI_DATANG, LAT_DATANG, LNG_DATANG,
             CONCAT('http://$ip_laptop/php-mobile-kayuhan/images/', FOTO_DATANG) AS url_foto

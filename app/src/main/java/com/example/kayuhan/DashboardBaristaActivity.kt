@@ -60,25 +60,14 @@ class DashboardBaristaActivity : AppCompatActivity(), NavigationView.OnNavigatio
             .replace(R.id.fragment_container, fragment)
             .commit()
 
-        if (fragment is FragmentPOS) {
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-            toggle.isDrawerIndicatorEnabled = false
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
-            toolbar.setNavigationOnClickListener {
-                loadFragment(FragmentDashboardAdmin())
-                navView.setCheckedItem(R.id.nav_dashboard)
-            }
-        } else {
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-            toggle.isDrawerIndicatorEnabled = true
-            toggle.syncState()
-            toolbar.setNavigationOnClickListener {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START)
-                } else {
-                    drawerLayout.openDrawer(GravityCompat.START)
-                }
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+        toggle.isDrawerIndicatorEnabled = true
+        toggle.syncState()
+        toolbar.setNavigationOnClickListener {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            } else {
+                drawerLayout.openDrawer(GravityCompat.START)
             }
         }
     }
@@ -90,7 +79,10 @@ class DashboardBaristaActivity : AppCompatActivity(), NavigationView.OnNavigatio
                 loadFragment(FragmentDashboardAdmin())
             }
             R.id.nav_kasir -> {
-                loadFragment(FragmentPOS())
+                val emailLogin = intent.getStringExtra("EXTRA_EMAIL")
+                val intentKasir = Intent(this, KasirActivity::class.java)
+                intentKasir.putExtra("EXTRA_EMAIL", emailLogin)
+                startActivity(intentKasir)
             }
             R.id.nav_menu -> {
                 loadFragment(FragmentMenu())

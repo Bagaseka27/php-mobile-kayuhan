@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/subLokasi"
+        android:title="Lokasi"
+        android:icon="@drawable/location" />
+    <item
+        android:id="@+id/subTransaksi"
+        android:title="Riwayat Transaksi"
+        android:icon="@drawable/transaksi" />
+    <item
+        android:id="@+id/subLogout"
+        android:title="Logout" />
+</menu>

@@ -108,7 +108,7 @@ class KaryawanPagerAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa) {
 class TabDataKaryawanFragment : Fragment() {
     private var _binding: TabDataKaryawanBinding? = null
     private val binding get() = _binding!!
-    private val apiUrl = "http://192.168.0.109/php-mobile-kayuhan/karyawan_action.php"
+    private val apiUrl = ApiConfig.KARYAWAN
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = TabDataKaryawanBinding.inflate(inflater, container, false)
@@ -159,7 +159,7 @@ class TabDataKaryawanFragment : Fragment() {
         dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
         val jabNames = mutableListOf<String>(); val jabIds = mutableListOf<Int>()
-        postKeServer(requireContext(), "http://192.168.0.109/php-mobile-kayuhan/jabatan_action.php", mapOf("action" to "list")) { res ->
+        postKeServer(requireContext(), ApiConfig.JABATAN, mapOf("action" to "list")) { res ->
             val data = org.json.JSONObject(res).getJSONArray("data")
             for(i in 0 until data.length()) {
                 val o = data.getJSONObject(i)
@@ -178,7 +178,7 @@ class TabDataKaryawanFragment : Fragment() {
 
         // Load Cabang from Server
         val cabNames = mutableListOf<String>(); val cabIds = mutableListOf<String>()
-        postKeServer(requireContext(), "http://192.168.0.109/php-mobile-kayuhan/lokasi_action.php", mapOf()) { res ->
+        postKeServer(requireContext(), ApiConfig.LOKASI, mapOf()) { res ->
             try {
                 val data = org.json.JSONArray(res)
                 for(i in 0 until data.length()) {
@@ -195,7 +195,7 @@ class TabDataKaryawanFragment : Fragment() {
         }
 
         // Load Rombong from Server
-        postKeServer(requireContext(), "http://192.168.0.109/php-mobile-kayuhan/rombong_action.php", mapOf("action" to "list")) { res ->
+        postKeServer(requireContext(), ApiConfig.ROMBONG, mapOf("action" to "list")) { res ->
             val data = org.json.JSONObject(res).getJSONArray("data")
             val romList = mutableListOf<String>()
             for(i in 0 until data.length()) romList.add(data.getJSONObject(i).getString("id_rombong"))
@@ -293,7 +293,7 @@ class TabPersetujuanGajiFragment : Fragment() {
     private lateinit var btnFilterDisetujui: com.google.android.material.button.MaterialButton
     private lateinit var btnFilterDitolak: com.google.android.material.button.MaterialButton
 
-    private val apiUrl = "http://192.168.0.109/php-mobile-kayuhan/gaji_action.php"
+    private val apiUrl = ApiConfig.GAJI
     private val listPengajuan = ArrayList<PengajuanGaji>()
     private var currentFilter = "menunggu"
 
@@ -479,7 +479,7 @@ class TabPersetujuanGajiFragment : Fragment() {
 class TabDataGajiFragment : Fragment() {
     private var _binding: TabDataGajiBinding? = null
     private val binding get() = _binding!!
-    private val apiUrl = "http://192.168.0.109/php-mobile-kayuhan/gaji_action.php"
+    private val apiUrl = ApiConfig.GAJI
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = TabDataGajiBinding.inflate(inflater, container, false)
@@ -617,7 +617,7 @@ class TabDataGajiFragment : Fragment() {
     // ─── Tabungan Dialog ───────────────────────────────────────────
 
     private fun showTabunganDialog() {
-        postKeServer(requireContext(), "http://192.168.0.109/php-mobile-kayuhan/karyawan_action.php", mapOf("action" to "list")) { kRes ->
+        postKeServer(requireContext(), ApiConfig.KARYAWAN, mapOf("action" to "list")) { kRes ->
             try {
                 val kData = org.json.JSONObject(kRes).getJSONArray("data")
                 val sb = StringBuilder()
@@ -789,7 +789,7 @@ class TabJadwalShiftFragment : Fragment() {
     private var _binding: TabJadwalShiftBinding? = null
     private val binding get() = _binding!!
 
-    private val apiUrl = "http://192.168.0.109/php-mobile-kayuhan/query_jadwal.php"
+    private val apiUrl = ApiConfig.JADWAL
     private val listJadwal = ArrayList<JadwalShift>()
     private lateinit var adapterJadwal: JadwalAdapter
 
@@ -840,7 +840,7 @@ class TabJadwalShiftFragment : Fragment() {
         dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
         val names = mutableListOf<String>(); val emails = mutableListOf<String>()
-        postKeServer(requireContext(), "http://192.168.0.109/php-mobile-kayuhan/karyawan_action.php", mapOf("action" to "list")) { res ->
+        postKeServer(requireContext(), ApiConfig.KARYAWAN, mapOf("action" to "list")) { res ->
             val data = org.json.JSONObject(res).getJSONArray("data")
             for(i in 0 until data.length()) {
                 val o = data.getJSONObject(i)
@@ -851,7 +851,7 @@ class TabJadwalShiftFragment : Fragment() {
         }
 
         val cabIds = mutableListOf<String>(); val cabNames = mutableListOf<String>()
-        postKeServer(requireContext(), "http://192.168.0.109/php-mobile-kayuhan/lokasi_action.php", mapOf()) { res ->
+        postKeServer(requireContext(), ApiConfig.LOKASI, mapOf()) { res ->
             val data = org.json.JSONArray(res)
             for(i in 0 until data.length()) {
                 val o = data.getJSONObject(i)
@@ -983,7 +983,7 @@ class TabJadwalShiftFragment : Fragment() {
 class TabJabatanFragment : Fragment() {
     private var _binding: TabJabatanBinding? = null
     private val binding get() = _binding!!
-    private val apiUrl = "http://192.168.0.109/php-mobile-kayuhan/jabatan_action.php"
+    private val apiUrl = ApiConfig.JABATAN
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = TabJabatanBinding.inflate(inflater, container, false)

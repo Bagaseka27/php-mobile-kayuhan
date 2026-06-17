@@ -47,7 +47,7 @@ class PresensiBaristaActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private val urlWebService = "http://192.168.0.32/php-mobile-kayuhan/insert_absensi.php"
+    private val urlWebService = ApiConfig.ABSENSI_INSERT
 
     private var currentLat = 0.0
     private var currentLng = 0.0
@@ -180,7 +180,7 @@ class PresensiBaristaActivity : AppCompatActivity() {
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 75, outputStream)
         val byteArray = outputStream.toByteArray()
-        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+        return Base64.encodeToString(byteArray, Base64.NO_WRAP)
     }
 
     private fun prosesSimpanAbsensi() {

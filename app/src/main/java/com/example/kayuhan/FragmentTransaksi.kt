@@ -15,7 +15,7 @@ class FragmentTransaksi : Fragment() {
 
     private lateinit var listView: ListView
     private lateinit var tvTotal: TextView
-    private val apiUrl = "http://192.168.0.109/php-mobile-kayuhan/transaksi_action.php"
+    private val apiUrl = ApiConfig.TRANSAKSI
 
     override fun onCreateView(
         inflater: LayoutInflater,

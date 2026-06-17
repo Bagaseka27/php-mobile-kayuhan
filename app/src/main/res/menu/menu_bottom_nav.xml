@@ -3,33 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:title="Beranda"
         android:id="@+id/itemBeranda"
-        android:icon="@drawable/home"
+        android:title="Dashboard"
+        android:icon="@drawable/ic_dashboard"
         app:showAsAction="always"/>
 
     <item
-        android:title="Karyawan"
         android:id="@+id/itemKaryawan"
+        android:title="Karyawan"
         android:icon="@drawable/group"
         app:showAsAction="always"/>
 
     <item
-        android:title="Menu"
+        android:id="@+id/itemAbsensi"
+        android:title="Absensi"
+        android:icon="@drawable/ic_presensi"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/itemMenu"
-        android:icon="@drawable/coffee"
+        android:title="Menu"
+        android:icon="@drawable/ic_menu"
         app:showAsAction="always"/>
 
     <item
-        android:title="Lokasi"
-        android:id="@+id/itemLokasi"
-        android:icon="@drawable/location"
-        app:showAsAction="always"/>
-
-    <item
-        android:id="@+id/itemTransaksi"
-        android:title="Transaksi"
-        android:icon="@drawable/transaksi"
+        android:id="@+id/itemMore"
+        android:title="More"
+        android:icon="@drawable/ic_more"
         app:showAsAction="always"/>
 
 </menu>

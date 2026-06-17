@@ -39,7 +39,7 @@ class GajiBaristaActivity : AppCompatActivity() {
     private var totalTabungan: Double = 0.0
     private var sisaGajiTotal: Double = 0.0
 
-    private val apiUrl = "http://192.168.0.109/php-mobile-kayuhan/gaji_action.php"
+    private val apiUrl = ApiConfig.GAJI
     private val riwayatList = ArrayList<RiwayatGajiItem>()
     private lateinit var adapter: RiwayatGajiAdapter
 
