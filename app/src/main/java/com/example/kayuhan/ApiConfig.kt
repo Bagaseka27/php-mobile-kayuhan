@@ -10,8 +10,6 @@ object ApiConfig {
     // Base URL untuk API PHP
     private const val BASE_URL = "http://$IP_ADDRESS/php-mobile-kayuhan/"
 
-    // Base URL untuk Web POS (Laravel)
-    private const val BASE_URL_WEB = "http://$IP_ADDRESS/KayuhanUAS/public/"
 
     // ─── Endpoint API ──────────────────────────────────────────
     val LOGIN           = "${BASE_URL}login.php"
@@ -29,6 +27,4 @@ object ApiConfig {
     val GET_MENU        = "${BASE_URL}get_menu.php"
     val INSERT_TRANSAKSI = "${BASE_URL}insert_transaksi.php"
 
-    // ─── Web POS ───────────────────────────────────────────────
-    val POS_WEB         = "${BASE_URL_WEB}barista/pos"
 }
