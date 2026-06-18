@@ -6,13 +6,30 @@ import android.os.Bundle
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
-import com.example.kayuhan.postKeServer
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
 
 class FragmentLokasi : Fragment() {
     private val apiUrl = ApiConfig.LOKASI
     private val apiRombongUrl = ApiConfig.ROMBONG
+
+    private fun postKeServer(url: String, params: Map<String, String> = mapOf(), callback: (String) -> Unit) {
+        val queue = Volley.newRequestQueue(requireContext())
+        val request = object : StringRequest(
+            Request.Method.POST, url,
+            { response -> callback(response) },
+            { error -> 
+                android.util.Log.e("API_ERROR", "Error at $url: ${error.message}")
+                Toast.makeText(context, "Koneksi Bermasalah", Toast.LENGTH_SHORT).show()
+            }
+        ) {
+            override fun getParams(): MutableMap<String, String> = params.toMutableMap()
+        }
+        queue.add(request)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_fragment_lokasi, container, false)
@@ -37,7 +54,7 @@ class FragmentLokasi : Fragment() {
         tableRombong.removeAllViews()
 
         // Load Cabang
-        postKeServer(requireContext(), apiUrl, mapOf()) { response ->
+        postKeServer(apiUrl, mapOf()) { response ->
             try {
                 val data = JSONArray(response)
                 for (i in 0 until data.length()) {
@@ -78,7 +95,7 @@ class FragmentLokasi : Fragment() {
         }
 
         // Load Rombong
-        postKeServer(requireContext(), apiRombongUrl, mapOf("action" to "list")) { response ->
+        postKeServer(apiRombongUrl, mapOf("action" to "list")) { response ->
             try {
                 val json = JSONObject(response)
                 val data = json.getJSONArray("data")
@@ -145,7 +162,7 @@ class FragmentLokasi : Fragment() {
                 "id_cabang" to etId.text.toString(),
                 "nama_cabang" to etNama.text.toString()
             )
-            postKeServer(requireContext(), apiUrl, params) {
+            postKeServer(apiUrl, params) {
                 loadData(requireView())
                 dialog.dismiss()
             }
@@ -164,7 +181,7 @@ class FragmentLokasi : Fragment() {
         val listCabang = mutableListOf<String>()
         val listIdCabang = mutableListOf<String>()
 
-        postKeServer(requireContext(), apiUrl, mapOf()) { response ->
+        postKeServer(apiUrl, mapOf()) { response ->
             try {
                 val data = JSONArray(response)
                 for (i in 0 until data.length()) {
@@ -202,7 +219,7 @@ class FragmentLokasi : Fragment() {
                 "id_rombong" to etId.text.toString(),
                 "id_cabang" to listIdCabang[spCabang.selectedItemPosition]
             )
-            postKeServer(requireContext(), apiRombongUrl, params) {
+            postKeServer(apiRombongUrl, params) {
                 loadData(requireView())
                 dialog.dismiss()
             }
@@ -215,7 +232,7 @@ class FragmentLokasi : Fragment() {
             .setTitle("Hapus Cabang")
             .setMessage("Apakah Anda yakin ingin menghapus cabang ini? Semua rombong di cabang ini juga akan terhapus.")
             .setPositiveButton("Ya") { _, _ ->
-                postKeServer(requireContext(), apiUrl, mapOf("mode" to "delete", "id_cabang" to id)) {
+                postKeServer(apiUrl, mapOf("mode" to "delete", "id_cabang" to id)) {
                     loadData(requireView())
                 }
             }
@@ -228,7 +245,7 @@ class FragmentLokasi : Fragment() {
             .setTitle("Hapus Rombong")
             .setMessage("Yakin hapus unit ini?")
             .setPositiveButton("Ya") { _, _ ->
-                postKeServer(requireContext(), apiRombongUrl, mapOf("mode" to "delete", "id_rombong" to id)) {
+                postKeServer(apiRombongUrl, mapOf("mode" to "delete", "id_rombong" to id)) {
                     loadData(requireView())
                 }
             }

@@ -19,6 +19,7 @@ object ApiConfig {
     val LOKASI          = "${BASE_URL}lokasi_action.php"
     val ROMBONG         = "${BASE_URL}rombong_action.php"
     val MENU            = "${BASE_URL}menu_action.php"
+    val IMAGES          = "${BASE_URL}images/"
     val TRANSAKSI       = "${BASE_URL}transaksi_action.php"
     val GAJI            = "${BASE_URL}gaji_action.php"
     val JADWAL          = "${BASE_URL}query_jadwal.php"

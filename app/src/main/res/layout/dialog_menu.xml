@@ -49,5 +49,21 @@
             android:hint="Harga Jual"
             android:inputType="number" />
 
+        <Button
+            android:id="@+id/btnPilihFoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pilih Foto"
+            android:layout_marginTop="12dp" />
+
+        <ImageView
+            android:id="@+id/ivPreviewMenu"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:scaleType="centerCrop" />
+
     </LinearLayout>
 </ScrollView>
